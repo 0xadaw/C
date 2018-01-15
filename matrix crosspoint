@@ -1,0 +1,91 @@
+#include <stdio.h>
+#define maxJ 17
+#define maxI 5
+
+int main() {
+
+    int matrix[maxI][maxJ];
+    int i,j;
+    int counter_max = 0;    //size of plane
+    int max = 0;            //value of cells composing the plane
+    int counter_right = 0;  //4 direction counters in 2d array
+    int counter_left = 0;   //..
+    int counter_up = 0;     //..
+    int counter_down = 0;   //..
+    int temp;               //stores crosspoint, we defined a crosspoint as a cell in a 2d array, were 1 cell above it, 1 bellow it, 1 cell to its right and 1 cell to its left are all equal to each other and it.
+    int m,k;                //moves on each of the 2 axes.
+
+    printf("Please enter values for the 2d array:"); //input to 2d array
+    for (i=0; i<maxI; i++)
+        for (j=0; j<maxJ; j++)
+            if (scanf("%d", &matrix[i][j]) != 1) return 0;
+
+    //we begin checking the rules for each cell that is inside the array but not on the edges.
+    for (i=1; i<maxI-1; i++)
+    {
+        for (j=1; j<maxJ-1; j++)
+        {
+            temp = matrix[i][j];
+            if ((matrix[i+1][j] == temp) && (matrix[i-1][j] == temp) && (matrix[i][j-1] == temp) && (matrix[i][j+1] == temp)){  //we identified a crosspoint! - a crosspoint is a point were cell abovr it bellow it to its right and left are all equal.
+                k=i-1;                                                                                                          //by defining a crosspoint we make the wings and body aren't forming a T shape which is illegal
+                m=j;
+                while((k>=0) && (matrix[k][m] == temp)) // we check and count of the cells above the crosspoint are equal to it, and we count them
+                {                                       ///note: the condition in while is boolean and composed of AND operator.
+                    counter_up++;                       ///it is a short-circuit evaluation. meaning, in this case. that when k (or m) are  negative, it will first check the first sub-condition (k >= 0)
+                    k--;                                ///and if it is false, then the whole condition is false; and it will not continue to check the second sub-condition (matrix[k][m]==temp).
+                }                                       ///so there will be no checking done for negative values as array indexes.
+
+                k=i+1;
+                m=j;
+                while((k<=maxI-1) && (matrix[k][m] == temp))    // we check and count of the cells bellow the crosspoint are equal to it, and we count them
+                {
+                    counter_down++;
+                    k++;
+                }
+
+                k=i;
+                m=j-1;
+                while((m>=0) && (matrix[k][m] == temp)) // we check and count of the cells to the left the crosspoint are equal to it, and we count them
+                {
+                    counter_left++;
+                    m--;
+                }
+
+                k=i;
+                m=j+1;
+                while((m<=maxJ-1) && (matrix[k][m] == temp))    // we check and count of the cells to the right the crosspoint are equal to it, and we count them
+                {
+                    counter_right++;
+                    m++;
+                }
+
+
+                if ((counter_left>0) && (counter_up>0) && (counter_down>0) && (counter_right>0)) // if all counts are made, in other words, we identified a crosspoint
+                    if (counter_left+counter_right != counter_up+counter_down)  //if the  wings are unequal in size to the body, we have a plane
+                        if ((counter_down == counter_up) || (counter_right == counter_left)) //if each part of the wing are equal (left and right OR up and down)
+                            if (counter_left+counter_right+counter_up+counter_down + 1 > counter_max) //we sum up the size of all parts that are expressed in our counters and add 1, for the crosspoint.
+                            {
+                                counter_max = counter_left+counter_right+counter_up+counter_down + 1;   //we compared with the largest so far, if bigger size, we replace with the bigger, and store the value of the cell making up the plane
+                                max = temp;
+                            }
+             // we reset the direction counters for another iteration.
+                counter_left = 0;
+                counter_right = 0;
+                counter_up = 0;
+                counter_down = 0;
+            }
+        }
+    }
+
+    if (counter_max != 0) //once we go through all cells as defined above, we check our maximum size of plane.
+       {
+        printf("\n");
+        printf("Maximum plane consists of the number: %d\n", max); //and print the value in the cells composing it, if it exists.
+       }
+    else{
+        printf("\n");
+        printf("NO VALID PLANES FOUND\n"); //no plane is found, maybe we should try a boat..
+        }
+
+return 0;
+}
