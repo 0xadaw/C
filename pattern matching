@@ -1,0 +1,64 @@
+ 
+#include <stdio.h>
+ 
+int pattern_matching(char* str, char* pattern, int* index);
+ 
+int main() {
+ 
+    char str[50];
+    char pattern[50];
+    int i = 0;
+    int* index = &i;
+ 
+ 
+   
+   
+    printf("String: ");
+    scanf("%s", str);
+    printf("Pattern: ");
+    scanf("%s", pattern);
+   
+ 
+    if (pattern_matching(str,pattern,index) == 0)
+        printf("No match: index pattern %d\n", *index);
+    else
+        printf("Match\n");
+ 
+   
+}
+ 
+ 
+int pattern_matching(char* str, char* pattern, int* index)
+{
+    int index_str = 0;
+    while ((*(str+index_str) != '\0') && (*(pattern+(*index)) != '\0')) {
+        if ( *(pattern+(*index)) == '*' ){
+           
+            while(*(pattern+(*index)) == '*') {*index += 1;}
+           
+            if (*(str+index_str+1) == *(pattern+(*index)))
+                index_str++;
+           
+            if (*(pattern+(*index)) == '\0')
+                return 1;
+        }
+        if (( (*(pattern+(*index)) <= 'z') && (*(pattern+(*index)) >= 'a')) || (*(pattern+(*index)) == '\0')){
+            if (*(str+index_str) != *(pattern+(*index)))
+                return 0;
+        }
+        if (*(pattern+(*index)) == '?')
+            if ((*(str+index_str) > 'z') && (*(str+index_str) < 'a'))
+                return 0;
+        *index += 1;
+        index_str++;
+    }
+   
+    while(*(pattern+(*index)) != '\0')
+    {
+        if ((*(pattern+(*index)) == '?') || ((*(pattern+(*index)) >= 'a')&&(*(pattern+(*index)) <= 'z')))
+            return 0;
+        *index += 1;
+    }
+       
+    return 1;
+}
