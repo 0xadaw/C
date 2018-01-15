@@ -1,0 +1,183 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX 10 //maximum size of name string and score string
+
+
+void CalcAndSort (char** Teams, char** Scores, int n, char** SortedTeams, int* SortedScores);
+
+int main()
+{
+
+    int NumTeams; // number of Teams in league
+    char** Teams; //Teams
+    char** Scores; //Scores
+    char** SortedTeams; //sorted Teams
+    int* SortedScores; //sorted Scores
+    int i;
+
+    printf("Please enter teams number: ");
+    if (scanf("%d",&NumTeams) != 1) return 0; //input number of Teams
+    printf("\n");
+
+    ///allocating memory for Teams
+    Teams = (char**) malloc(sizeof(char*) * NumTeams); //memory allocation to an array of pointers (tier 1)- pointing to pointers (tier 2), holding team names (Strings)
+    if (Teams == NULL) exit(0);
+
+    for (i = 0; i < NumTeams; i++) //memory allocation for the pointers (tier 2) holding team names
+        {
+            Teams[i] = malloc((MAX+1) * sizeof(char));
+            if (Teams[i] == NULL) exit(0);
+        }
+
+
+    ///allocating memory for Scores
+    Scores = (char**) malloc(sizeof(char*) * NumTeams);  //memory allocation to an array of pointers - pointing to team score sign (Strings)
+    if (Scores == NULL) exit(0);
+
+    for (i = 0; i < NumTeams; i++) //memory allocation for the pointers (tier 2) holding sorted team names
+        {
+            Scores[i] = malloc((MAX+1) * sizeof(char));
+            if (Scores[i] == NULL) exit(0);
+        }
+
+    ///clearing buffer
+    getchar();
+
+    /// Scanning Teams names and their Scores.
+    for(i = 0 ; i < NumTeams; i++)
+        {
+        printf("Please enter team name: ");
+        if (scanf("%s", Teams[i]) != 1) return 0;
+        printf("\n");
+        printf("Please enter team score: ");
+        if (scanf("%s", Scores[i]) != 1) return 0;
+        printf("\n");
+        }
+
+        /*see pointers*///for(i = 0 ; i < NumTeams ;i++){ printf("strings %p ,score is %p", Teams[i], Scores[i]);}
+
+
+    ///allocating memory for the sorted Teams
+    SortedTeams = (char**) malloc(sizeof(char*) * NumTeams); //memory allocation to an array of pointers (tier 1)- pointing to pointers (tier 2), holding sorted team names (Strings)
+    if (SortedTeams == NULL) exit(0);
+
+    for (i = 0; i < NumTeams; i++) //memory allocation for the pointers (tier 2) holding sorted team names
+        {
+            SortedTeams[i] = malloc((MAX+1) * sizeof(char));
+            if (SortedTeams[i] == NULL) exit(0);
+        }
+
+    ///allocating memory for sorted Scores
+    SortedScores = (int*) malloc(sizeof(int) * NumTeams);  //memory allocation to an array of integers holding the sorted Scores
+    if (SortedScores == NULL) exit(0);
+
+    ///initializing sorted Scores array to zeros
+    for (i=0;i<NumTeams;i++)
+    SortedScores[i]=0;
+
+  ///call the function
+  CalcAndSort(Teams,Scores,NumTeams,SortedTeams,SortedScores);
+
+  ///print results
+  for(i=0; i<NumTeams; i++)
+    {
+      printf("%s %d", SortedTeams[i], SortedScores[i]);
+      if (i<NumTeams-1) printf("\n");
+    }
+    ///freeing allocated memory
+    for (i = 0; i < NumTeams; i++) free(Teams[i]);
+    free(Teams);
+    for (i = 0; i < NumTeams; i++) free(Scores[i]);
+    free(Scores);
+    for (i = 0; i < NumTeams; i++) free(SortedTeams[i]);
+    free(SortedTeams);
+    free(SortedScores);
+
+
+ return 0;
+}
+
+
+void CalcAndSort (char** Teams, char** Scores, int n, char** SortedTeams, int* SortedScores)
+{
+    int i,j;
+    int count;
+    int sum=0;
+    int *temp;
+    int current; //used for sorting algorithm
+    int sequence; //used to sort the team names. it detects and counts a sequence of the same score sum in the final sortedScores.
+
+    ///for every Team[i], translate score signs in Scores[i] into integer sum of scores, and  then store it in SortedScores[i]
+    for (i=0; i<n; i++)
+    {
+        count=0;
+        sum=0;
+        while( *(Scores[i] +count) != '\0' )
+        {
+            if ( *(Scores[i] +count) == 'w') {sum+=3;}
+            else {
+                    if ( *(Scores[i] +count) == 'd') sum+=1;
+                 }
+
+            count++;
+        }
+        SortedScores[i]=sum;
+
+    }
+    /*test loop:*///for (i=0; i<n; i++) printf("%d ", SortedScores[i]);
+
+    /// we know the sorted array cell number i corresponds to team [i]. in other words, SortedScores[i] is team[i]'s total score
+    /// in order to maintain that order we copy sorted Scores into a temporary array called temp
+    ///this temporary array will hold the sum of Scores in correlation with each team number i.
+
+    temp = (int*) malloc(sizeof(int) * n);//allocating memory to temp
+    if (SortedScores == NULL) exit(0);
+
+    for (i=0;i<n;i++) //we then copy the SortedScores array to temp, maintaining the same order
+    temp[i]= SortedScores[i];
+    /*test array*///for (i=0;i<n;i++) printf("%d",temp[i]);
+
+    ///we now apply Insertion Sorting on the array SortedScores. we will get a sorted - SortedScores!
+    ///by copying the array, we are free to perform WHATEVER sorting algorithm we wish, in great convenience, without accidentally changing anything else!.
+
+    for (i = 1; i < n; i++)                                      /* find space for the i-th number */
+        {
+            current = SortedScores[i];                                  /* the current number to store */
+                for (j = i; SortedScores[j-1] < current && j > 0; j--)
+                    {      ///notice: '>' will sort by ascending order, '<' will sort by descending order :-) ///
+                        SortedScores[j] = SortedScores[j-1];                  /* make space */
+                    }
+            SortedScores[j] = current;                                 /* store current number in the space made */
+        }
+   /*check sorted array*/// for (i=0; i<n; i++) printf("%d ", SortedScores[i]);
+   /*check temp array*///for (i=0; i<n; i++) printf("%d ", temp[i]);
+
+   ///SortedScores is now , indeed, sorted by descending order!
+   ///now we go ahead and insert the Teams to the array SortedTeams, by order of score (and if it's a tie, by appearance)
+   for(j=0; j<n; j++)
+   {
+        sequence=0; //in case we encounter a similar score, we want to count each step, so we don't skip the tied team names
+        for(i=0; i<n; i++)
+            {
+                if (SortedScores[j] == temp[i]) //if the sorted equals temp which holds the scores and is correlated with to Teams with i
+                    {
+                        strcpy(SortedTeams[j+sequence],Teams[i]); //we copy the name to the sorted array, by score
+                        temp[i]= -1;                              //we replace the temp score by -1 to indicate we processed it
+                        sequence+= 1;                             //we count the steps in case it is a sequence of similar scores
+                    }
+            }
+   }
+   /*check*/// for (j=0; j<n;j++) printf("%s  %d , ", SortedTeams[j], SortedScores[j]);
+   ///freeing allocated memory of temp array
+    free(temp);
+}
+
+
+//         _     _
+//        ( \---/ )  [ad]ib
+//         ) . . (
+//___,--._(___Y___)_,--.________
+//   `--'           `--'
+
