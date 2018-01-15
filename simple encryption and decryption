@@ -1,0 +1,246 @@
+#include <stdio.h>
+#define N 49   //  N+1 is the number of chars we are receiving !!
+
+int main(){
+    char crypt[N+1] = {0}, decrypt[N+1] = {0};
+    char st;
+    int n, i, method, point, aski, di = 0;
+
+
+printf("Please enter your encryption method: ");
+
+if (scanf("%d", &method) != 1)                            // checks input type
+    {printf("\nerror");
+    return 0;
+    }
+
+    if (method == 1)                                  //!////~Method One START~/////
+        {                                                        //*****************************************************************//
+            //***************************************************//  Receives input, feeds into crypt[], until user hits enter      //
+            getchar();                                           //*****************************************************************//
+            printf("\nPlease enter your encrypted data: ");      //
+            n = 0;                                               //
+            st = getchar();                                      //
+            while ((st != '\0') && (st != '\n') && (n <= N))     // stops registering input in the array once n is bigger than N, meaning we surpassed our limit so the input beyond that is not relevant.
+                {                                                // we enter input into the crypt[] array
+                    crypt[n]= st;                                //
+                    n++;                                         //! when we exit while loop, "n" holds number of chars entered !!!
+                    st = getchar();                              // we will re-use this in method 2 & 3.
+                }
+                                                                                //******************************************************************//                                                                //
+           //*******************************************************************//  Checks if small letter or space, else terminates.               //
+            i=0;                                                                //******************************************************************//
+            while (i<n)                                                         //
+                {                                                               //                                                                          //
+                    if ('a' <= crypt[i] && crypt[i] <= 'z')                     //
+                        i++;                                                    //
+                        else {                                                  //
+                                if (crypt[i] == ' ')                            //
+                                    i++;                                        //
+                                    else {                                      //
+                                            printf("\nerror");                  // note: we can check the values of n & i at any time by adding printf("n: %d, i: %d",n, i);
+                                            return 0;                           //
+                                         }                                      //
+                             }                                                  //
+                                                                                //
+                }                                                               // if successful ,"i" will check every cell, therefore i=n (n= input length).
+
+            if (i == n)                                                              //*****************************************************************************************//
+                { //*****************************************************************// Method One engine                                                                       //
+                    while (n>0)                                                      //*****************************************************************************************//
+                    {                                                                // "n" still holds the number of chars entered by user, not the number of cells in crypt[] !!
+                        if (crypt[n-1] == ' ')                                       // n-1: because the array always starts from 0!
+                            n=n-1;                                                   // we're moving *backwards* from the last cell holding character.
+                            else {                                                   // to cell 0..
+                                    crypt[n-1]=122 - (crypt[n-1]-'a');               // in words: 'z' minus the "distance" from 'a' to character.
+                                    n=n-1;                                           // we move to the next cell (from behind)
+                                 }                                                   //
+                    }                                                                //
+
+                    for (n = 0; i > n; n++){decrypt[n]= crypt[n];}                   // insert into the designated array and prints the decrypted msg.
+                    printf("\nThe decrypted data is: ");
+                    for (n = 0; i > n; n++){printf("%c", decrypt[n]);}
+                    return 0;
+                }
+
+
+        }                                             //!////~Method One END~//////
+
+                                                      //!///~Method Two START~/////
+        else if (method == 2)
+        {
+
+            {                                                    //*****************************************************************//
+            //***************************************************//  Receives input, feeds into crypt[], until user hits enter      //
+            getchar();                                           //*****************************************************************//
+            printf("\nPlease enter your encrypted data: ");         //
+            n = 0;                                               //
+            st = getchar();                                      //
+            while ((st != '\0') && (st != '\n') && (n <= N))     // stops registering input in the array once n is bigger than N, meaning we surpassed our limit so the input beyond that is not relevant.
+                {                                                // we enter input into the crypt[] array
+                    crypt[n]= st;                                //
+                    n++;                                         //! when we exit while loop, "n" holds number of chars entered !!!
+                    st = getchar();                              // we will re-use this in method 3.
+                }
+
+            }                                                                               //**********************************************************************************************************//
+             //*****************************************************************************//  Checks if char is a small letter or space, or digit, or if '-' comes before a a digit. else terminates. //
+            i=n;                                                                            //**********************************************************************************************************//
+            while (0<i)                                                                     // starts from the last char, and reduces by 1 until the first char (cell number 0)
+                {                                                                           //
+                    if ('a' <= crypt[i-1] && crypt[i-1] <= 'z')                             // we parse the string.
+                        i=i-1;                                                              //
+                        else {                                                              //
+                                if (crypt[i-1] == ' ')                                      // if its space, we don't do anything.
+                                    i=i-1;                                                  //
+                                    else {                                                  //
+                                            if ('0' <= crypt[i-1] && crypt[i-1] <= '9')     // if there is
+                                                { if (i>1)                                  //
+                                                    {                                       //
+                                                        if (crypt[i-2] == '-')              //  we check that each - is followed by a digit. and no '-' is left without a paired digit from the right only! (ex: -9 is correct, 9- is not correct)
+                                                        i=i-2;                              //
+                                                        else i=i-1;                         //
+                                                    }                                       //
+                                                     else i=i-1;                            //  if not then its a 'normal' number
+                                                                                            //
+                                                }                                           //
+                                                else                                        //
+                                                    {                                       //
+                                                    printf("\nerror");                      // if string is not valid itll report error and terminate
+                                                    return 0;                               //
+                                                    }                                       //
+                                         }                                                  //
+                            }                                                               // EVENTUALLY, if the check is successful we will get a string that correlates with the demands of the exercise.
+                }                                                                           // therefore we can go ahead and run the Method Two engine, as the string (array now) is valid.
+                                                                                            // also if successful, "i" will reduce from n to i=0. we double check anyway.
+            if (i==0)
+                                                                                            //****************************************//
+            {//*****************************************************************************// Method Two engine                      //                                                   //
+                for (i=0; i<n; i++)                                                         //****************************************//
+                {                                                                           // we assume the string (array crypt) is valid
+                    if (crypt[i] ==' ')                                                     // because we checked it already.
+                        {                                                                   // each char is fed to the decrypted array
+                            decrypt[di]= crypt[i];                                          //
+                            di= di + 1;                                                     //
+                        }                                                                   //
+                                                                                            //
+                    if ('0' <= crypt[i] && crypt[i] <= '9')                                 // for positive digits = jumps to the right:
+                        {                                                                   //
+                            point= crypt[i] - '0';                                          // we simply subtract the ascii value of 0 from the ascii value of char
+                            point= point + i;                                               // by performing that we get the int parallel to the ascii and know the jump "distance"
+                            if (point<n)                                                    //
+                                    {                                                       // if the distance is greater than the string length, we terminate
+                                        decrypt[di]= crypt[point];                          // insert to decrypted array..
+                                        di= di + 1;                                         //
+                                    }                                                       //
+                                    else                                                    //
+                                        {                                                   //
+                                            printf("\nerror");                              //
+                                            return 0;                                       //
+                                        }                                                   //
+                        }                                                                   //
+                                                                                            //
+                    if (crypt[i] == '-')                                                    // if we reach a dash '-' or a negative
+                        {                                                                   // then we jump 1 cell to figure out the digit (we know its there, we already checked the string/array)
+                            point= crypt[i+1] - '0';                                        // we decrease from the '-' location ot get the left jumps
+                            point= i - point;                                               //
+                                                                                            //
+                            if (point >= 0)                                                 // we don't want to out of the array.. so we check.
+                                {                                                           //
+                                    decrypt[di]= crypt[point];                              //inserts to decrypted array, terminates if we jumped out
+                                    di= di + 1;                                             //
+                                }                                                           //
+                                else                                                        //
+                                    {                                                       //
+                                        printf("\nerror");                                  //
+                                        return 0;                                           //
+                                    }                                                       //
+                            i=i+1;                                                          // don't forget the counter! :)
+
+                        }
+                }
+                printf("\nThe decrypted data is: ");                                        //prints the decrypted message..
+                for (i = 0; di > i; i++){ printf("%c", decrypt[i]); }
+                return 0;
+            }
+
+
+        }
+                                                      //!///~Method Two END~/////
+
+                                                      //!///~Method THREE START~/////
+
+        else if (method == 3)
+          {                                                      //*****************************************************************//
+            //***************************************************//  Receives input, feeds into crypt[], until user hits enter      //
+            getchar();                                           //*****************************************************************//
+            printf("\nPlease enter your encrypted data: ");      //
+            n = 0;                                               //
+            st = getchar();                                      //
+            while ((st != '\0') && (st != '\n') && (n <= N))     // stops registering input in the array once n is bigger than N, meaning we surpassed our limit so the input beyond that is not relevant.
+                {                                                // we enter input into the crypt[] array
+                    crypt[n]= st;                                //
+                    n++;                                         //! when we exit while loop, "n" holds number of chars entered !!!
+                    st = getchar();                              //
+                }
+                                                                                //******************************************************************//                                                                //
+           //*******************************************************************//  Checks if small letter or space, else terminates.               //
+            i=0;                                                                //******************************************************************//
+            while (i<n)                                                         // same as parser of method one..
+                {                                                               //
+                    if ('a' <= crypt[i] && crypt[i] <= 'z')                     //
+                        i++;                                                    //
+                        else {                                                  //
+                                if (crypt[i] == ' ')                            //
+                                    i++;                                        //
+                                    else {                                      //
+                                            printf("\nerror");                  // note: we can check the values of n & i at any given time by adding printf("n: %d, i: %d",n, i);
+                                            return 0;                           //
+                                         }                                      //
+                             }                                                  //
+                                                                                //
+                }                                                               //
+                                                                                // if successful ,"i" will check every cell, therefore i=n (n= input length).
+
+            if (i == n)                                                            //*********************************************************************//
+                { //***************************************************************// Method Three engine                                                 //
+                    for (i=0; i<n ;i++)                                            //*********************************************************************//
+                    {                                                              // we identified 3 special characters as in need for special treatment..
+                        if (crypt[i] == 'a')                                       // a
+                            {                                                      // we insert ascii value of cryptp[i]  to point
+                                point= crypt[i];                                   // and add 23!
+                                aski= point + 23;                                  // why 23? ascii table! its the distance between a and z..
+                                decrypt[i]= aski;                                  // insert to the decryption array.
+                            }                                                      // same follows for b, c.
+                        if (crypt[i] == 'b')                                       //...
+                            {                                                      //
+                                point= crypt[i];                                   //
+                                aski= point + 23;                                  //
+                                decrypt[i]= aski;                                  //
+                            }                                                      //
+                        if (crypt[i] == 'c')                                       //...
+                            {                                                      //
+                                point= crypt[i];                                   //
+                                aski= point + 23;                                  //
+                                decrypt[i]= aski;                                  //
+                            }                                                      //
+                        if (crypt[i] >= 'd' && crypt[i] <= 'z')                    // as for the rest of the letters
+                            {   point= crypt[i];                                   // we only jump back 3 steps in the ascii table, no special cases here..
+                                aski= point -3;                                    //
+                                decrypt[i]= aski;                                  //
+                            }                                                      //
+                        if (crypt[i] == ' ')                                       // we like space. we keep space.
+                                decrypt[i]= ' ';                                   //
+                    }
+
+                    printf("\nThe decrypted data is: ");                           // prints the decrypted msg.
+                    for (di = 0; n > di; di++){ printf("%c", decrypt[di]); }
+                    return 0;
+                }
+          }
+                                                                //!///~Method THREE END~/////
+
+        else printf("\nerror");                                                    // error if int but not 1-3 range (including).
+    return 0;
+
+    }
