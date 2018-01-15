@@ -1,0 +1,281 @@
+
+#include <stdio.h>
+#include <stdlib.h>
+
+
+typedef struct node{
+    int number;
+    struct node *next;
+    struct node *prev;
+}node;
+
+node *NewNode(int number);
+node *Linknode(int number, node *head);
+int function1(node *head, int steps);
+int function2(node *head, int list_counter);
+int mid_list_finder(int list_counter);
+void print_list(node *head);
+void SortList(node *head, int list_counter);
+void Swap(node *pointer);
+
+int main() {
+    
+    int is_bore;
+    int list_counter = 0;
+    int steps;
+    int tempint;
+    int final_step;
+    node *head = NULL;
+    
+    // get the list from the user until he puts -100 and create a list
+    printf("Enter your values: ");
+    while(1)
+    {
+        if (scanf("%d", &tempint)!=1)
+            exit(1);
+        if (tempint == -100)
+            break;
+        
+        head = Linknode(tempint,head); // linking the new node to the list
+        list_counter++; // counting the number of node in the list
+        
+    }
+    
+    //print_list(head);
+    
+    printf("Enter number of rounds: ");
+    if (scanf("%d", &steps)!=1)
+        exit(1);
+    
+    final_step = function1(head,steps);
+    if (final_step == 1)
+        printf("\nGame status: success");
+    if (final_step == 0)
+        printf("\nGame status: deadlock");
+    if (final_step == -1)
+        printf("\nGame status: failure");
+    
+    is_bore = function2(head,list_counter);
+    if (is_bore == 1)
+        printf("\nList is: a bore");
+    else
+    {
+        printf("\nList is: not a bore");
+        SortList(head, list_counter);
+        printf("\n");
+        print_list(head);
+        is_bore = function2(head, list_counter);
+        if (is_bore == 1)
+            printf("\nNew List is: now a bore");
+        else
+            printf("\nNew List is: still not a bore");
+    }
+    
+
+
+
+    
+
+}
+
+//create a new node of node*
+node *NewNode(int number){
+    node *new = malloc(sizeof(node)); // allocate a node
+    
+    new->number = number;
+    new->next = NULL; // setting to NULL to ensure the end of the list
+    new->prev = NULL; // setting to NULL to ensure the start of the list if its the head
+    
+    return new;
+}
+
+//link a node to the end of the list
+node *Linknode(int number, node *head){
+   
+    node *temp = head;
+    node *new = NewNode(number); // create another node with NewNode function
+    
+    if (head == NULL){ // checking if we need to set this node as the head
+        head = new;
+        return head;
+    }
+    
+    while(temp->next != NULL) // getting to the end of the list
+        temp = temp->next;
+    
+    temp->next = new; // linking the next pointer
+    new->prev = temp; // linking the prev pointer to the prev node
+    
+    return head;
+    
+}
+
+int function1(node *head, int steps)
+{
+    node *pointer;
+    int step_counter = 1; // counter for number of rounds
+    int tempnode;
+    
+    
+    pointer = head;
+    while(step_counter <= steps)
+    {
+        tempnode = pointer->number; // assigning the current node number
+        
+        if (tempnode == 0) // if the current node number is 0
+            if (step_counter <= steps) // checking if we are in a deadlock
+                return 0;
+        
+        if (tempnode < 0)
+        {
+            while(tempnode != 0) // we are going to increase the tempnode untill we get to 0
+            {                    // this will tell us the number of steps we need to go to the left
+                
+                if (pointer->prev == NULL) // checking if we overdo the list
+                {
+                    return -1;
+                }
+                pointer = pointer->prev;
+                tempnode++; // increase to 0
+            }
+        }
+        
+        if (tempnode > 0)
+        {
+            while(tempnode != 0) // we are going to decrease the tempnode untill we get to 0
+            {                    // this will tell us the number of steps we need to go to the right
+                
+                if (pointer->next == NULL) // checking if we overdo the list
+                {
+                    return -1;
+                }
+                pointer = pointer->next;
+                tempnode--; // decrease to 0
+            }
+        }
+        step_counter++; // counting the number of rounds
+        
+    }
+    return 1;
+}
+
+int function2(node *head, int list_counter)
+{
+    int mid_list = mid_list_finder(list_counter); // assigning the middle of the list and counter for the second half of the list
+    int first_counter = 1; // counter for the first half of the list
+    int second_counter = mid_list;
+    node *pointer = head;
+    
+    
+    while(first_counter < mid_list)
+    {
+        if (pointer->number <= pointer->next->number) // checking if the first half list isnt going down
+            return 0;
+
+        pointer = pointer->next;
+       
+        first_counter++;
+        
+    }
+    
+    pointer = pointer->next; // going to the next half of the list
+    
+    while(second_counter+1 < list_counter)
+    {
+        if (pointer->number >= pointer->next->number) // checking if the second half list isnt going up
+            return 0;
+
+        pointer = pointer->next;
+        
+        second_counter++;
+    }
+    return 1;
+    
+}
+
+int mid_list_finder(int list_counter)
+{
+    if (list_counter % 2 == 0) // checking for the middle of the list
+        return (list_counter/2); // even number of nodes in the list
+    else
+        return (list_counter/2)+1; // odd number of nodes in the list
+}
+
+void print_list(node *head)
+{
+    node *pointer = head;
+    
+    printf("New List numbers are: ");
+    while(pointer != NULL)
+    {
+        if (pointer->next == NULL)
+            printf("%d", pointer->number); // if this is the last number we dont print another space after
+        else
+            printf("%d ", pointer->number);
+        
+        pointer = pointer->next;
+        
+    }
+}
+
+void SortList(node *head, int list_counter) // bubble sort implementaion with linked list
+{
+    int mid_list = mid_list_finder(list_counter);
+    int i,j;
+    int get_mid = 1;
+    node *pointer = head;
+    node *mid_pointer;
+    
+    
+    for (i=1; i<mid_list; i++)
+    {
+        for (j=1; j<=mid_list-i; j++)
+        {
+            if (pointer->number < pointer->next->number) // if the next number is greater than the prev
+            {
+                //swap the numbers
+                Swap(pointer);
+            }
+            if (j < mid_list-i) // not necessary but just in case
+                pointer = pointer->next;
+        }
+        pointer = head; // getting to the beggining of the list
+    }
+    
+    while (get_mid < mid_list+1)   // we are in head position, we need to get to the mid_list+1 position
+    {
+        pointer = pointer->next;
+        get_mid++;
+    }
+    
+    mid_pointer = pointer; // so we can always go back to the beggining of the second half of the list
+    
+    for (i=mid_list+1; i<list_counter; i++)
+    {
+        for (j=1; j<=list_counter-i; j++)
+        {
+            if (mid_pointer->number > mid_pointer->next->number) // if the next number is lesser than the prev
+            {
+                //swap the number
+                Swap(mid_pointer);
+            }
+            if (j < list_counter-i) // not necessary but just in case
+                mid_pointer = mid_pointer->next;
+        }
+        mid_pointer = pointer; // getting to the beggining of the second half of the list
+    }
+}
+
+void Swap(node *pointer)
+{
+
+    pointer->next->number = pointer->number + pointer->next->number;
+    pointer->number = pointer->next->number - pointer->number;
+    pointer->next->number = pointer->next->number - pointer->number;
+    
+    // example for swap: a=10, b=12
+    // b = a+b = 10+12 = 22
+    // a = b-a = 22-10 = 12
+    // b = b-a = 22-12 = 10
+    
+}
