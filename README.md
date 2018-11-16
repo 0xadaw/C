@@ -1,2 +1,2 @@
 # C
-some C solutions and shit.
+some C solutions and stuff.
